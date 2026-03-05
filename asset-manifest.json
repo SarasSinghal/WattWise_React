@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/WattWise_React/static/css/main.c0f2129d.css",
+    "main.js": "/WattWise_React/static/js/main.d701f197.js",
+    "static/js/213.21bb716c.chunk.js": "/WattWise_React/static/js/213.21bb716c.chunk.js",
+    "static/js/455.dd2a3372.chunk.js": "/WattWise_React/static/js/455.dd2a3372.chunk.js",
+    "static/js/337.2b96108f.chunk.js": "/WattWise_React/static/js/337.2b96108f.chunk.js",
+    "index.html": "/WattWise_React/index.html",
+    "main.c0f2129d.css.map": "/WattWise_React/static/css/main.c0f2129d.css.map",
+    "main.d701f197.js.map": "/WattWise_React/static/js/main.d701f197.js.map",
+    "213.21bb716c.chunk.js.map": "/WattWise_React/static/js/213.21bb716c.chunk.js.map",
+    "455.dd2a3372.chunk.js.map": "/WattWise_React/static/js/455.dd2a3372.chunk.js.map",
+    "337.2b96108f.chunk.js.map": "/WattWise_React/static/js/337.2b96108f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c0f2129d.css",
+    "static/js/main.d701f197.js"
+  ]
+}
