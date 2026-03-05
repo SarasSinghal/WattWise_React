@@ -1,0 +1,153 @@
+.dashboard {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ecf0f1;
+}
+
+.dashboard-title {
+  margin: 0 0 25px 0;
+  color: #2c3e50;
+  font-size: 22px;
+  font-weight: 700;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #f9fafb 100%);
+  border-radius: 10px;
+  padding: 20px;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  color: #7f8c8d;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  color: #2c3e50;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stat-subtext {
+  color: #95a5a6;
+  font-size: 12px;
+}
+
+/* Specific card colors */
+.energy-card {
+  border-left-color: #f39c12;
+}
+
+.active-card {
+  border-left-color: #2ecc71;
+}
+
+.threshold-card {
+  border-left-color: #9b59b6;
+}
+
+.devices-card {
+  border-left-color: #e74c3c;
+}
+
+/* Dark mode */
+.dark-mode .dashboard {
+  background: #34495e;
+  border-color: #2c3e50;
+}
+
+.dark-mode .dashboard-title {
+  color: #ecf0f1;
+  border-bottom-color: #2c3e50;
+}
+
+.dark-mode .stat-card {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+}
+
+.dark-mode .stat-label {
+  color: #95a5a6;
+}
+
+.dark-mode .stat-value {
+  color: #ecf0f1;
+}
+
+.dark-mode .stat-subtext {
+  color: #7f8c8d;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard {
+    padding: 20px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-container {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard {
+    padding: 15px;
+    margin: 15px 0;
+  }
+
+  .dashboard-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .stat-card {
+    padding: 15px;
+  }
+
+  .stat-icon {
+    font-size: 28px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+}

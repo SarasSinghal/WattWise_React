@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Power, Trash2 } from 'lucide-react';
+import '../styles/DeviceCard.css';
 
-const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
+const DeviceCard = ({ device, onToggle, onDelete, deviceManager, messageManager }) => {
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const [currentConsumption, setCurrentConsumption] = useState(0);
 
   useEffect(() => {
@@ -14,10 +16,34 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
     return () => clearInterval(interval);
   }, [device]);
 
+  useEffect(() => {
+    const consumption = device.calculatePowerConsumption();
+    if (device.status && consumption > device.powerRating * 0.85) {
+      setShowAlert(true);
+      setAlertMessage(`High power usage: ${consumption.toFixed(2)}W`);
+      const timer = setTimeout(() => setShowAlert(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [device.status, device.powerRating, device.calculatePowerConsumption]);
+
+  const getDeviceIcon = (type) => {
+    const icons = {
+      light: '💡',
+      fan: '💨',
+      ac: '❄️',
+      tv: '📺',
+      heater: '🔥',
+      default: '⚡'
+    };
+    return <span style={{ fontSize: '24px' }}>{icons[type] || icons.default}</span>;
+  };
+
   const handleToggle = () => {
     if (device.toggle()) {
       const action = device.status ? 'connected' : 'disconnected';
-      messageManager.addMessage(action, device.name);
+      if (messageManager) {
+        messageManager.addMessage(action, device.name);
+      }
     }
   };
 
@@ -25,20 +51,62 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
     device.updateControl(controlName, value);
   };
 
-  const getStatusClass = () => {
-    if (device.inCooldown) return 'cooldown';
-    return device.status ? 'on' : 'off';
-  };
+  const powerPercentage = (currentConsumption / device.powerRating) * 100;
 
-  const getStatusText = () => {
-    if (device.inCooldown) return 'COOLDOWN';
-    return device.status ? 'ON' : 'OFF';
-  };
+  return (
+    <div className={`device-card ${device.status ? 'active' : 'inactive'}`}>
+      {showAlert && (
+        <div className="alert-banner">
+          ⚠️ {alertMessage}
+        </div>
+      )}
 
-  const renderControls = () => {
-    switch (device.type) {
-      case 'fan':
-        return (
+      <div className="device-header">
+        <div className="device-icon-wrapper">
+          <div className={`device-icon ${device.status ? 'powered-on' : 'powered-off'}`}>
+            {getDeviceIcon(device.type)}
+          </div>
+        </div>
+        <button
+          className="delete-btn"
+          onClick={() => onDelete(device.id)}
+          title="Remove device"
+        >
+          ×
+        </button>
+      </div>
+
+      <h3 className="device-name">{device.name}</h3>
+
+      <div className="device-status">
+        <span className={`status-indicator ${device.status ? 'active' : 'inactive'}`}></span>
+        <span className="status-text">
+          {device.status ? 'Active' : 'Off'}
+        </span>
+      </div>
+
+      <div className="power-info">
+        <div className="power-row">
+          <span className="power-label">Power:</span>
+          <span className="power-value">{currentConsumption.toFixed(2)}W</span>
+        </div>
+        <div className="power-bar-container">
+          <div
+            className={`power-bar ${powerPercentage > 85 ? 'high' : powerPercentage > 50 ? 'medium' : 'low'}`}
+            style={{ width: `${Math.min(powerPercentage, 100)}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {device.inCooldown && (
+        <div className="cooldown-notice">
+          ⏱️ Cooling down... Power limit exceeded
+        </div>
+      )}
+
+      {/* Render Controls */}
+      <div className="device-controls">
+        {device.type === 'fan' && (
           <div className="control-group">
             <label>Speed: {device.controls.speed}%</label>
             <input
@@ -46,13 +114,12 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="0"
               max="100"
               value={device.controls.speed}
-              onChange={(e) => handleControlChange('speed', e.target.value)}
+              onChange={(e) => handleControlChange('speed', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      case 'ac':
-        return (
+        )}
+        {device.type === 'ac' && (
           <div className="control-group">
             <label>Temperature: {device.controls.temperature}°C</label>
             <input
@@ -60,13 +127,12 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="16"
               max="30"
               value={device.controls.temperature}
-              onChange={(e) => handleControlChange('temperature', e.target.value)}
+              onChange={(e) => handleControlChange('temperature', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      case 'light':
-        return (
+        )}
+        {device.type === 'light' && (
           <div className="control-group">
             <label>Brightness: {device.controls.brightness}%</label>
             <input
@@ -74,13 +140,12 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="0"
               max="100"
               value={device.controls.brightness}
-              onChange={(e) => handleControlChange('brightness', e.target.value)}
+              onChange={(e) => handleControlChange('brightness', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      case 'heater':
-        return (
+        )}
+        {device.type === 'heater' && (
           <div className="control-group">
             <label>Heat Level: {device.controls.heatLevel}%</label>
             <input
@@ -88,13 +153,12 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="0"
               max="100"
               value={device.controls.heatLevel}
-              onChange={(e) => handleControlChange('heatLevel', e.target.value)}
+              onChange={(e) => handleControlChange('heatLevel', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      case 'tv':
-        return (
+        )}
+        {device.type === 'tv' && (
           <div className="control-group">
             <label>Volume: {device.controls.volume}%</label>
             <input
@@ -102,13 +166,12 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="0"
               max="100"
               value={device.controls.volume}
-              onChange={(e) => handleControlChange('volume', e.target.value)}
+              onChange={(e) => handleControlChange('volume', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      case 'generic':
-        return (
+        )}
+        {device.type === 'generic' && (
           <div className="control-group">
             <label>Power Level: {device.controls.power}%</label>
             <input
@@ -116,67 +179,21 @@ const DeviceCard = ({ device, onDelete, deviceManager, messageManager }) => {
               min="0"
               max="100"
               value={device.controls.power}
-              onChange={(e) => handleControlChange('power', e.target.value)}
+              onChange={(e) => handleControlChange('power', parseInt(e.target.value))}
               disabled={!device.status}
             />
           </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className="device-card">
-      <div className="device-header">
-        <div>
-          <div className="device-title">{device.getIcon()} {device.name}</div>
-          <div className="device-type">{device.type.charAt(0).toUpperCase() + device.type.slice(1)}</div>
-        </div>
-        <span className={`device-status ${getStatusClass()}`}>
-          {getStatusText()}
-        </span>
+        )}
       </div>
 
-      <div className="device-info">
-        <div className="info-row">
-          <span className="info-label">Power Rating</span>
-          <span className="info-value">{device.powerRating} W</span>
-        </div>
-        <div className="info-row">
-          <span className="info-label">Status</span>
-          <span className="info-value">
-            {device.status ? '🔌 Connected' : '⊘ Disconnected'}
-          </span>
-        </div>
-      </div>
-
-      <div className="device-power">
-        <div className="power-label">Current Power Draw</div>
-        <div className="power-value">{currentConsumption} W</div>
-      </div>
-
-      <div className="device-controls">
-        {renderControls()}
-      </div>
-
-      <div className="device-actions">
-        <button
-          className={`btn btn-toggle ${device.status ? 'on' : 'off'}`}
-          onClick={handleToggle}
-          disabled={device.inCooldown}
-        >
-          <Power size={16} />
-          {device.status ? 'Turn OFF' : 'Turn ON'}
-        </button>
-        <button
-          className="btn btn-delete"
-          onClick={() => onDelete(device.id)}
-        >
-          <Trash2 size={16} />
-          Remove
-        </button>
-      </div>
+      <button
+        className={`toggle-btn ${device.status ? 'on' : 'off'}`}
+        onClick={handleToggle}
+        disabled={device.inCooldown}
+      >
+        <span>⚡</span>
+        <span>{device.status ? 'Turn Off' : 'Turn On'}</span>
+      </button>
     </div>
   );
 };

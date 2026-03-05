@@ -7,10 +7,6 @@ export class PDFReportService {
   constructor() {
     this.reportTitle = 'WattWise Energy Report';
   }
-
-  /**
-   * Generate comprehensive energy report PDF
-   */
   generateEnergyReport(deviceManager, messageManager) {
     const devices = deviceManager.getAllDevices();
 

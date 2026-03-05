@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
+import DashboardStats from './components/DashboardStats';
 import DeviceGrid from './components/DeviceGrid';
+import EnergyChart from './components/EnergyChart';
+import ReportGenerator from './components/ReportGenerator';
 import ChartsSection from './components/ChartsSection';
 import MessagesSection from './components/MessagesSection';
 import { DeviceManager } from './services/DeviceManager';
@@ -14,6 +17,7 @@ function App() {
   const [messageManager] = useState(() => new MessageManager());
   const [pdfService] = useState(() => new PDFReportService());
   const [theme, setTheme] = useState('light');
+  const [devices, setDevices] = useState([]);
 
   useEffect(() => {
     // Load theme from localStorage
@@ -36,7 +40,11 @@ function App() {
     // Start real-time updates
     const interval = setInterval(() => {
       deviceManager.updateEnergyConsumption();
+      setDevices([...deviceManager.getAllDevices()]);
     }, 1000);
+
+    // Initial device load
+    setDevices([...deviceManager.getAllDevices()]);
 
     return () => clearInterval(interval);
   }, [deviceManager, messageManager]);
@@ -61,7 +69,10 @@ function App() {
       />
       <main className="main-container">
         <Dashboard deviceManager={deviceManager} />
+        <DashboardStats devices={devices} />
+        <ReportGenerator devices={devices} />
         <DeviceGrid deviceManager={deviceManager} messageManager={messageManager} />
+        <EnergyChart devices={devices} />
         <ChartsSection deviceManager={deviceManager} />
         <MessagesSection messageManager={messageManager} />
       </main>
